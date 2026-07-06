@@ -8,7 +8,9 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("UI References")]
     [SerializeField] private TMP_Text scoreText;
-    [SerializeField] private TMP_Text gameOverText;
+
+    [Header("Game Flow")]
+    [SerializeField] private GameFlowManager gameFlowManager;
 
     [Header("Forward Movement")]
     [SerializeField] private float forwardSpeed = 8f;
@@ -24,23 +26,24 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 lastInputPosition;
     private bool isDragging;
     private bool isGameOver;
+    private bool hasStarted;
 
     private void Start()
     {
         targetX = transform.position.x;
 
         UpdateScoreUI();
+    }
 
-        if (gameOverText != null)
-        {
-            gameOverText.gameObject.SetActive(false);
-        }
+    public void BeginGame()
+    {
+        hasStarted = true;
     }
 
     private void Update()
     {
-        // Once the game is over, freeze the cat completely - no forward, no swerve.
-        if (isGameOver)
+        // Sit still until the start screen is dismissed, and freeze completely once the game is over.
+        if (!hasStarted || isGameOver)
         {
             return;
         }
@@ -131,10 +134,9 @@ public class PlayerMovement : MonoBehaviour
         currentXVelocity = 0f;
         isDragging = false;
 
-        if (gameOverText != null)
+        if (gameFlowManager != null)
         {
-            gameOverText.text = "GAME OVER";
-            gameOverText.gameObject.SetActive(true);
+            gameFlowManager.ShowGameOver();
         }
 
         Debug.Log("Game Over! You hit an obstacle.");
