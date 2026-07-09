@@ -13,7 +13,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private GameFlowManager gameFlowManager;
 
     [Header("Forward Movement")]
-    [SerializeField] private float forwardSpeed = 8f;
+    [SerializeField] private float forwardSpeed = 2f;
+    [SerializeField] private float speedIncreaseAmount = 0.5f;
+    [SerializeField] private float speedIncreaseDistance = 10f; // meters traveled between each speed bump
 
     [Header("Swerve Settings")]
     [SerializeField] private float swerveSensitivity = 0.02f; // how much drag delta translates into world units
@@ -27,10 +29,13 @@ public class PlayerMovement : MonoBehaviour
     private bool isDragging;
     private bool isGameOver;
     private bool hasStarted;
+    private float distanceTraveled;
+    private float nextSpeedIncreaseDistance;
 
     private void Start()
     {
         targetX = transform.position.x;
+        nextSpeedIncreaseDistance = speedIncreaseDistance;
 
         UpdateScoreUI();
     }
@@ -49,7 +54,16 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Constant forward movement on Z, always on regardless of input.
-        transform.Translate(Vector3.forward * forwardSpeed * Time.deltaTime, Space.World);
+        float moveDistance = forwardSpeed * Time.deltaTime;
+        transform.Translate(Vector3.forward * moveDistance, Space.World);
+
+        // Ramp difficulty up over distance instead of time, so swerve skill controls the pace.
+        distanceTraveled += moveDistance;
+        if (distanceTraveled >= nextSpeedIncreaseDistance)
+        {
+            forwardSpeed += speedIncreaseAmount;
+            nextSpeedIncreaseDistance += speedIncreaseDistance;
+        }
 
         HandleSwerveInput();
 
