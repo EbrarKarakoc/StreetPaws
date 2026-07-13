@@ -1,30 +1,76 @@
-# Street Paws 
+# 🐾 Street Paws
 
-Street Paws is a 3D hypercasual "endless runner" prototype developed using Unity. The game features an easy-to-learn swerve mechanic where players control a low-poly street cat, dodging obstacles and collecting rewards to achieve the highest score.
+![Unity](https://img.shields.io/badge/Unity-6000.5.3f1-000000?logo=unity&logoColor=white)
+![Pipeline](https://img.shields.io/badge/URP-Universal%20Render%20Pipeline-5c2d91)
+![Platform](https://img.shields.io/badge/Platform-WebGL%20%7C%20Mobile-orange)
+![Status](https://img.shields.io/badge/Status-Prototype-yellow)
 
-##  Core Gameplay & Features
-*   **Swerve Mechanics:** Simple one-finger control. Swipe left or right to move the cat across lanes.
-*   **Continuous Action:** The character runs forward automatically on the Z-axis. No jumping or stopping required.
-*   **Risk & Reward System:**
-    *    **PawCoins:** Regular collectibles (+1 Point). *(Currently disabled in the scene while tagging issues are ironed out — logic exists in `PlayerMovement.cs` but no Coin objects are tagged yet.)*
-    *    **Gold Stars:** High-value collectibles placed in risky spots (+5 Points).
-    *    **Bombs:** Lethal obstacles. Hitting a bomb tries to trigger its `Animator` explosion (via an `Explode` trigger parameter) and results in an instant Game Over.
+**Street Paws** is a 3D hypercasual **endless runner** built with Unity. You control a low-poly street cat sprinting through an endless city street — swerve left and right with a single finger to dodge trash bins, trees and signs while collecting PawCoins for the highest score.
 
-##  Tech Stack
-*   **Game Engine:** Unity 2022.3.30f1 (URP)
-*   **Programming Language:** C#
+## 🎮 Core Gameplay
 
-## ▶ Getting Started
-1.  Install [Unity Hub](https://unity.com/download) and Unity **2022.3.30f1** (or a compatible 2022.3 LTS patch) with the URP template support.
-2.  Clone this repository.
-3.  Open the project folder from Unity Hub (`Add project from disk`).
-4.  Open `Assets/Scenes/SampleScene.unity` and press Play.
-5.  Controls: click-and-drag (mouse) or swipe (touch) left/right to swerve.
+* **Swerve-only control** — one finger (or mouse drag) moves the cat smoothly across the road. No jumping, no stopping. By design.
+* **Endless city** — the road never ends, built from recycled chunks with buildings flowing past on both sides.
+* **Risk & reward** — grab PawCoins (+1) while avoiding lethal street obstacles.
+* **Instant restart** — hit something, watch the animated Game Over card pop in, tap anywhere (or smash the pulsing **TEKRAR OYNA** button) and you're running again in under a second.
 
-##  Future Roadmap
-This prototype serves as the foundation for the game. Planned future updates include:
-*   Transitioning from an infinite runner to a structured level-based progression system.
-*   A Main Menu Hub where players can spend collected PawCoins.
-*   Character upgrades (speed, magnet radius, temporary bomb invincibility).
-*   Unlockable cat skins and fur patterns.
-*   New environments and "Boss" encounters (e.g., dodging a grumpy low-poly dog).
+## 🏗️ Architecture Highlights
+
+The whole game runs with **zero runtime `Instantiate`/`Destroy` calls** — everything is pooled, which keeps WebGL and mobile builds stutter-free.
+
+| Script | Responsibility |
+|---|---|
+| `CatController` | Auto-forward run + drag-based swerve within road bounds |
+| `ChunkManager` | Lays out road chunks, recycles the rear chunk to the front as the cat advances |
+| `ChunkController` | Per-chunk spawn points; spawns/clears obstacles & collectibles on recycle |
+| `ObjectPool` | Generic reusable pool (chunks, every obstacle type, collectibles) |
+| `Obstacle` | Trigger → Game Over via the state manager |
+| `Collectible` | Trigger → adds score, returns itself to its pool |
+| `ScoreManager` | PawCoin counter + top-right HUD bar |
+| `GameStateManager` | Run/GameOver state, delayed any-input restart (scene reload) |
+| `GameOverScreen` | Code-driven UI animation: fade-in, card pop (ease-out-back), pulsing button |
+
+**Fair difficulty guarantee:** the spawn system never fills every spawn point of a chunk with obstacles — there is always an escape corridor.
+
+**Obstacle variety:** each obstacle type (trash bin, tree, sign...) has its own pool; the spawner picks a random type per spawn point.
+
+## 🕹️ Controls
+
+| Action | Desktop | Mobile / Touch |
+|---|---|---|
+| Swerve left / right | Hold left mouse button + drag | Drag finger across the screen |
+| Restart after Game Over | Any key or click | Tap anywhere |
+
+## ▶️ Getting Started
+
+1. Install [Unity Hub](https://unity.com/download) and **Unity 6000.5.3f1** (Unity 6.5) with URP support.
+2. Clone this repository and add the project folder in Unity Hub (`Add project from disk`).
+3. Open `Assets/Scenes/SampleScene.unity` and press **Play**.
+
+## 🗺️ Roadmap
+
+- [x] Swerve movement system
+- [x] Endless chunk-based road + object pooling
+- [x] Obstacle & collectible spawn system (multi-type obstacles)
+- [x] Animated Game Over card + instant restart
+- [x] Score HUD (PawCoins)
+- [ ] Gold Stars (+5) and Bombs as distinct pickups
+- [ ] Best-score save + score on the Game Over card
+- [ ] Chunk layout variants for more visual variety
+- [ ] Moving obstacles (ping-pong bikes/scooters)
+- [ ] 5 prototype levels + **Cat Evolution** reward
+- [ ] Shop: Magnet & Shield power-ups
+- [ ] WebGL build & publish (itch.io / GitHub Pages)
+
+## 🧰 Tech & Assets
+
+* **Engine:** Unity 6000.5.3f1 — Universal Render Pipeline (URP), C#
+* **UI:** Unity UI + TextMesh Pro
+* **Art packs:**
+  * [SimplePoly City — Low Poly Assets](https://assetstore.unity.com) (streets, buildings, props)
+  * BTM Items & Gems (coins, stars, bombs)
+  * Ladymito Free Cat (cat model & animations)
+
+---
+
+*This is a living prototype — the design document (GDD) evolves alongside the code.* 🐈
