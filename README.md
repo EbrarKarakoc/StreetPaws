@@ -1,4 +1,4 @@
-# 🐾 Street Paws
+#  Street Paws
 
 ![Unity](https://img.shields.io/badge/Unity-6000.5.3f1-000000?logo=unity&logoColor=white)
 ![Pipeline](https://img.shields.io/badge/URP-Universal%20Render%20Pipeline-5c2d91)
@@ -7,14 +7,14 @@
 
 **Street Paws** is a 3D hypercasual **endless runner** built with Unity. You control a low-poly street cat sprinting through an endless city street — swerve left and right with a single finger to dodge trash bins, trees and signs while collecting PawCoins for the highest score.
 
-## 🎮 Core Gameplay
+## Core Gameplay
 
 * **Swerve-only control** — one finger (or mouse drag) moves the cat smoothly across the road. No jumping, no stopping. By design.
 * **Endless city** — the road never ends, built from recycled chunks with buildings flowing past on both sides.
 * **Risk & reward** — grab PawCoins (+1) while avoiding lethal street obstacles.
 * **Instant restart** — hit something, watch the animated Game Over card pop in, tap anywhere (or smash the pulsing **TEKRAR OYNA** button) and you're running again in under a second.
 
-## 🏗️ Architecture Highlights
+##  Architecture Highlights
 
 The whole game runs with **zero runtime `Instantiate`/`Destroy` calls** — everything is pooled, which keeps WebGL and mobile builds stutter-free.
 
@@ -34,20 +34,20 @@ The whole game runs with **zero runtime `Instantiate`/`Destroy` calls** — ever
 
 **Obstacle variety:** each obstacle type (trash bin, tree, sign...) has its own pool; the spawner picks a random type per spawn point.
 
-## 🕹️ Controls
+## Controls
 
 | Action | Desktop | Mobile / Touch |
 |---|---|---|
 | Swerve left / right | Hold left mouse button + drag | Drag finger across the screen |
 | Restart after Game Over | Any key or click | Tap anywhere |
 
-## ▶️ Getting Started
+##  Getting Started
 
 1. Install [Unity Hub](https://unity.com/download) and **Unity 6000.5.3f1** (Unity 6.5) with URP support.
 2. Clone this repository and add the project folder in Unity Hub (`Add project from disk`).
 3. Open `Assets/Scenes/SampleScene.unity` and press **Play**.
 
-## 🗺️ Roadmap
+##  Roadmap
 
 - [x] Swerve movement system
 - [x] Endless chunk-based road + object pooling
@@ -62,7 +62,7 @@ The whole game runs with **zero runtime `Instantiate`/`Destroy` calls** — ever
 - [ ] Shop: Magnet & Shield power-ups
 - [ ] WebGL build & publish (itch.io / GitHub Pages)
 
-## 🧰 Tech & Assets
+##  Tech & Assets
 
 * **Engine:** Unity 6000.5.3f1 — Universal Render Pipeline (URP), C#
 * **UI:** Unity UI + TextMesh Pro
