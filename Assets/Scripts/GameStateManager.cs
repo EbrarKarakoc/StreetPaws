@@ -11,14 +11,14 @@ public class GameStateManager : MonoBehaviour
     // referans tutamadığı için buraya bu static üzerinden ulaşırlar (basit singleton)
     public static GameStateManager Instance { get; private set; }
 
-    [Header("Referanslar")]
+    [Header("References")]
     // Çarpışmada durdurulacak kedi
     public CatController cat;
 
     // Açılacak Game Over ekranı (GameOverPanel'deki GameOverScreen bileşeni)
     public GameOverScreen gameOverScreen;
 
-    [Header("Yeniden Başlatma")]
+    [Header("Restart")]
     // Game Over sonrası girişlerin kaç saniye yok sayılacağı
     // (çarpma anında zaten ekranda olan parmak/tık, ekranı anında geçmesin)
     public float restartDelay = 0.8f;
@@ -51,7 +51,20 @@ public class GameStateManager : MonoBehaviour
         gameOverTime = Time.time;
 
         cat.Die();
-        gameOverScreen.Show();
+
+        // Skoru sonlandır: mevcut mesafe rekoru geçtiyse kaydet, final değerleri karta ilet.
+        // (Coin'e bakılmaz — rekor yalnızca mesafeyle kırılır.)
+        int finalPaws = 0;
+        int best = 0;
+        bool isNewRecord = false;
+        if (ScoreManager.Instance != null)
+        {
+            finalPaws = ScoreManager.Instance.CurrentPaws;
+            isNewRecord = ScoreManager.Instance.CommitRecord();
+            best = ScoreManager.Instance.bestDistance;
+        }
+
+        gameOverScreen.Show(finalPaws, best, isNewRecord);
     }
 
     private void Update()

@@ -6,11 +6,11 @@ using UnityEngine;
 // engel/collectible yerleştirir (havuzdan çeker) ve eskilerini temizler.
 public class ChunkController : MonoBehaviour
 {
-    [Header("Chunk Ayarları")]
+    [Header("Chunk Settings")]
     // Bu chunk'ın Z eksenindeki uzunluğu (ChunkManager'daki chunkLength ile AYNI olmalı!)
     public float chunkLength = 20f;
 
-    [Header("Spawn Noktaları")]
+    [Header("Spawn Points")]
     // Prefab içine elle yerleştirilen boş objeler (örn. x = -3/0/3, farklı z'lerde).
     // Her nokta her turda ya engel, ya collectible alır ya da boş kalır.
     public Transform[] spawnPoints;
@@ -28,7 +28,8 @@ public class ChunkController : MonoBehaviour
     // sonra her spawn noktası için zar atıp engel/collectible/boş kararı verir.
     // obstaclePools: her eleman farklı bir engel türünün havuzu; tür rastgele seçilir.
     public void SpawnItems(ObjectPool[] obstaclePools, ObjectPool collectiblePool,
-                           float obstacleChance, float collectibleChance)
+                           ObjectPool starPool, float obstacleChance, float collectibleChance,
+                           float starChance)
     {
         ClearSpawns(); // Önceki turdan kalanlar üst üste binmesin
 
@@ -58,7 +59,16 @@ public class ChunkController : MonoBehaviour
             }
             else if (roll < obstacleChance + collectibleChance)
             {
-                Spawn(collectiblePool, spawnPoints[i]);
+                // Collectible şeridi: nadiren coin yerine STAR çıkar (starChance),
+                // gerisi normal coin. Star da coin gibi havuzlanır (tek-sahiplik iadesi).
+                if (starPool != null && Random.value < starChance)
+                {
+                    Spawn(starPool, spawnPoints[i]);
+                }
+                else
+                {
+                    Spawn(collectiblePool, spawnPoints[i]);
+                }
                 nonObstacleCount++;
             }
             else
@@ -68,18 +78,15 @@ public class ChunkController : MonoBehaviour
         }
     }
 
-    // Bu chunk'a ait itemleri havuzlarına iade eder
+    // Bu chunk'a ait itemleri havuzlarına iade eder.
+    // Bu chunk, spawn ettiği her item'ın TEK iade sahibidir: toplanan collectible'lar
+    // kendini yalnızca gizler (SetActive false), havuza asıl iadeyi burası yapar. Böylece
+    // aynı obje asla iki kez iade edilmez ve aktif bir item başka chunk'a "çalınmaz".
     public void ClearSpawns()
     {
         foreach (SpawnedItem item in spawnedItems)
         {
-            // Toplanmış collectible kendini ZATEN havuza iade etti (activeSelf = false).
-            // İkinci kez Return edersek havuzda çift kayıt oluşur → aynı obje iki kez
-            // dağıtılır ve hayalet objeler görürüz. O yüzden sadece aktif olanları iade et.
-            if (item.obj.activeSelf)
-            {
-                item.pool.Return(item.obj);
-            }
+            item.pool.Return(item.obj);
         }
 
         spawnedItems.Clear();
@@ -96,13 +103,6 @@ public class ChunkController : MonoBehaviour
         GameObject obj = pool.Get();
         obj.transform.position = point.position;
         obj.transform.rotation = point.rotation;
-
-        // Collectible ise kendini iade edebilmesi için havuz referansını ver
-        Collectible collectible = obj.GetComponent<Collectible>();
-        if (collectible != null)
-        {
-            collectible.pool = pool;
-        }
 
         spawnedItems.Add(new SpawnedItem { obj = obj, pool = pool });
     }

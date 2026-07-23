@@ -8,7 +8,7 @@ using UnityEngine;
 // Şimdilik chunk'lar için; Faz 4'te engel ve collectible'lar için de AYNI sınıf kullanılacak.
 public class ObjectPool : MonoBehaviour
 {
-    [Header("Havuz Ayarları")]
+    [Header("Pool Settings")]
     // Havuzun üretip dağıtacağı prefab
     public GameObject prefab;
 

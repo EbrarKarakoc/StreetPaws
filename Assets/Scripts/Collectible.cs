@@ -1,16 +1,15 @@
 using UnityEngine;
 
-// Toplanabilir obje (pati altını vb.): kedi değince skoru artırır ve KENDİNİ havuza iade eder.
+// Toplanabilir obje (pati altını vb.): kedi değince skoru artırır ve KENDİNİ gizler.
+// Havuza iadeyi collectible YAPMAZ — o iş, bu objeyi spawn eden ChunkController'a
+// aittir (ClearSpawns). Böylece toplanan obje, sahibi chunk geri dönüşene kadar havuza
+// girmez; başka bir chunk onu Get edip "çalamaz" (çapraz-chunk aliasing önlenir).
 // Collectible prefab'inin collider'ı "Is Trigger" işaretli olmalı.
 public class Collectible : MonoBehaviour
 {
-    [Header("Değer")]
+    [Header("Value")]
     // Bu obje toplanınca skora kaç puan eklenir (coin=1; ileride yıldız=5)
     public int value = 1;
-
-    // Bu objeyi veren havuz — spawn sırasında ChunkController tarafından atanır,
-    // Inspector'dan elle atanmaz (o yüzden gizli)
-    [HideInInspector] public ObjectPool pool;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -20,7 +19,7 @@ public class Collectible : MonoBehaviour
             return; // Kedi değilse umursama
         }
 
-        // Skoru artır (Debug.Log yok artık — Console'u şişirmesin)
+        // Skoru artır
         if (ScoreManager.Instance != null)
         {
             ScoreManager.Instance.AddCoins(value);
@@ -30,13 +29,9 @@ public class Collectible : MonoBehaviour
             Debug.LogWarning("Collectible: Sahnede ScoreManager yok! GameFlow objesine eklemeyi unutma.");
         }
 
-        if (pool != null)
-        {
-            pool.Return(gameObject); // Destroy yok — havuza geri dön, tekrar kullanılacak
-        }
-        else
-        {
-            gameObject.SetActive(false); // Havuz atanmamışsa en azından görünmez ol
-        }
+        // Havuza iade ETME — sadece gizlen. Asıl iadeyi, bu objeyi spawn eden chunk
+        // recycle olurken ChunkController.ClearSpawns yapar (tek iade otoritesi).
+        // Böylece obje havuza erken dönüp başka chunk tarafından "çalınamaz".
+        gameObject.SetActive(false);
     }
 }

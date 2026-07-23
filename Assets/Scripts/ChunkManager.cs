@@ -7,21 +7,21 @@ using UnityEngine;
 // tetiklenir; ihtimaller ve havuzlar buradan (tek yerden) yönetilir.
 public class ChunkManager : MonoBehaviour
 {
-    [Header("Chunk Ayarları")]
+    [Header("Chunk Settings")]
     // Aynı anda sahnede duracak chunk sayısı
     public int chunkCount = 5;
 
     // Her chunk'ın Z uzunluğu (prefab'deki ChunkController.chunkLength ile AYNI olmalı!)
     public float chunkLength = 20f;
 
-    [Header("Referanslar")]
+    [Header("References")]
     // Kedinin transform'u — ne kadar ilerlediğini takip etmek için
     public Transform player;
 
     // Chunk'ları veren havuz (PoolManager objesindeki ObjectPool bileşeni)
     public ObjectPool chunkPool;
 
-    [Header("Spawn Havuzları (Faz 4)")]
+    [Header("Spawn Pools (Phase 4)")]
     // Engel havuzları — HER ENGEL TÜRÜ İÇİN BİR HAVUZ (çöp kutusu, ağaç, bank...).
     // Spawn sırasında bu diziden rastgele bir tür seçilir → görsel çeşitlilik.
     public ObjectPool[] obstaclePools;
@@ -29,7 +29,10 @@ public class ChunkManager : MonoBehaviour
     // Collectible'ları veren havuz (CollectiblePool objesi)
     public ObjectPool collectiblePool;
 
-    [Header("Spawn İhtimalleri")]
+    // Star'ları veren havuz (StarPool objesi) — nadir; collectible şeridinde coin yerine çıkar
+    public ObjectPool starPool;
+
+    [Header("Spawn Chances")]
     // Her spawn noktasının ENGEL olma ihtimali (0-1 arası)
     [Range(0f, 1f)] public float obstacleChance = 0.3f;
 
@@ -37,7 +40,10 @@ public class ChunkManager : MonoBehaviour
     // İkisinin toplamı 1'i geçmesin; kalan ihtimal = nokta boş kalır.
     [Range(0f, 1f)] public float collectibleChance = 0.4f;
 
-    [Header("Geri Dönüşüm")]
+    // Collectible çıktığında bunun COIN yerine STAR olma ihtimali (nadir olmalı, örn. 0.12)
+    [Range(0f, 1f)] public float starChance = 0.12f;
+
+    [Header("Recycling")]
     // En arkadaki chunk'ın merkezi, oyuncunun kaç chunk-boyu gerisinde kalınca öne taşınsın.
     // 1 = tam bir chunk boyu geride kalınca (kamera arkayı görmesin diye yeterli pay).
     public float recycleThreshold = 1f;
@@ -133,7 +139,7 @@ public class ChunkManager : MonoBehaviour
             ChunkController controller = chunk.GetComponent<ChunkController>();
             if (controller != null)
             {
-                controller.SpawnItems(obstaclePools, collectiblePool, obstacleChance, collectibleChance);
+                controller.SpawnItems(obstaclePools, collectiblePool, starPool, obstacleChance, collectibleChance, starChance);
             }
         }
     }

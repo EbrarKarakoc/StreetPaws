@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 // Fiyakalı Game Over ekranı: karartma yumuşakça belirir (fade-in),
@@ -7,7 +8,7 @@ using UnityEngine;
 // GameOverPanel objesine eklenir; GameStateManager, Show() ile tetikler.
 public class GameOverScreen : MonoBehaviour
 {
-    [Header("Referanslar")]
+    [Header("References")]
     // Panelin kendi CanvasGroup'u (karartma + tüm içeriğin fade'i)
     public CanvasGroup panelGroup;
 
@@ -18,7 +19,17 @@ public class GameOverScreen : MonoBehaviour
     // "dokun" yazısının CanvasGroup'u (nabız efekti için)
     public CanvasGroup restartGroup;
 
-    [Header("Animasyon Ayarları")]
+    [Header("Score / Record")]
+    // Kartta gösterilen final skor ("X Paws")
+    public TMP_Text finalScoreText;
+
+    // Kartta gösterilen rekor ("Best: X")
+    public TMP_Text cardBestText;
+
+    // Opsiyonel: yalnızca yeni rekor kırılınca aktifleşen rozet/yazı (atanması ŞART değil)
+    public GameObject newRecordBadge;
+
+    [Header("Animation Settings")]
     // Karartmanın görünme süresi (saniye)
     public float fadeDuration = 0.35f;
 
@@ -31,10 +42,26 @@ public class GameOverScreen : MonoBehaviour
     // "dokun" yazısının nabız hızı
     public float pulseSpeed = 3f;
 
-    // GameStateManager çağırır: paneli aç ve animasyonu başlat
-    public void Show()
+    // GameStateManager çağırır: final skoru/rekoru yaz, paneli aç ve animasyonu başlat
+    public void Show(int finalPaws, int best, bool isNewRecord)
     {
         gameObject.SetActive(true);
+
+        // Kart yazıları — bir kez çalışır (kare-başı değil), allocation sorun değil
+        if (finalScoreText != null)
+        {
+            finalScoreText.text = finalPaws + " Paws";
+        }
+        if (cardBestText != null)
+        {
+            cardBestText.text = "Best: " + best;
+        }
+        // Rozet opsiyonel: atanmışsa yalnızca yeni rekorda göster
+        if (newRecordBadge != null)
+        {
+            newRecordBadge.SetActive(isNewRecord);
+        }
+
         StopAllCoroutines(); // Güvenlik: üst üste çağrılırsa animasyon karışmasın
         StartCoroutine(Animate());
     }

@@ -45,6 +45,6 @@ StreetPaws is a 3D hypercasual **endless runner** (Subway Surfers model). A stre
 - Write clean, highly optimized C# suitable for hypercasual WebGL/mobile.
 - Do NOT use `Update()` for physics calculations; use `FixedUpdate()` if Rigidbodies are involved, but prefer simple Transform movement for this game's feel (current scripts are transform-driven with kinematic-safe triggers).
 - Object pooling is mandatory for anything spawned during a run.
-- Always add brief comments explaining the logic — existing code comments are in **Turkish**; keep that style.
+- Always add brief comments explaining the logic — existing code comments are in **Turkish**; keep that style. **Exception — Inspector-facing text is English:** `[Header(...)]` labels (and similar Unity UI strings) are written in English to match the English Unity editor and keep the Inspector readable. In short: code comments in Turkish, Inspector labels in English.
 - When providing code, specify exactly which GameObject the script should be attached to in the Unity Editor.
 - Brainstorm/discuss first; only write code or create files after an explicit "do it" instruction from the user (respond in Turkish).
