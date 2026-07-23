@@ -11,10 +11,12 @@
 
 * **Swerve-only control** — one finger (or mouse drag) moves the cat smoothly across the road. No jumping, no stopping. By design.
 * **Endless city** — the road never ends, built from recycled chunks with buildings flowing past on both sides.
-* **PawCoins** — collectible currency scattered across the road (+1 each).
+* **Speed ramp** — the run keeps accelerating with distance (8 → 16 units/s); difficulty is speed, not level design.
+* **Score, coins & record** — distance = **Paws** score; **PawCoins** are a separate wallet (+1 each); your best distance is saved (PlayerPrefs) and shown on the Game Over card.
+* **Stars & bombs** — grab a rare **Star** for a timed **2× Paws** multiplier (screen flash + pulsing 2× badge); a **Bomb** ends the run on contact.
 * **Instant restart** — hit something, watch the animated Game Over card pop in, tap anywhere (or smash the pulsing **TEKRAR OYNA** button) and you're running again in under a second.
 
-## Design Pillars (GDD v0.4)
+## Design Pillars (GDD v0.5)
 
 The design targets below are locked in and being implemented stage by stage (see Roadmap):
 
@@ -30,15 +32,16 @@ The whole game runs with **zero runtime `Instantiate`/`Destroy` calls** — ever
 
 | Script | Responsibility |
 |---|---|
-| `CatController` | Auto-forward run + drag-based swerve within road bounds |
-| `ChunkManager` | Lays out road chunks, recycles the rear chunk to the front as the cat advances |
-| `ChunkController` | Per-chunk spawn points; spawns/clears obstacles & collectibles on recycle |
-| `ObjectPool` | Generic reusable pool (chunks, every obstacle type, collectibles) |
-| `Obstacle` | Trigger → Game Over via the state manager |
-| `Collectible` | Trigger → adds to the counter, returns itself to its pool |
-| `ScoreManager` | PawCoin counter + top-right HUD bar (becomes the pure currency counter after the economy split) |
+| `CatController` | Auto-forward run + distance-based speed ramp (8→16) + drag-based swerve; exposes `DistanceTraveled` (the Paws score source) |
+| `ChunkManager` | Lays out road chunks, recycles the rear chunk to the front; feeds obstacle/collectible/star pools & spawn chances |
+| `ChunkController` | Per-chunk spawn points; spawns obstacles / coins / rare stars, and is the SOLE pool-returner on recycle |
+| `ObjectPool` | Generic reusable pool (chunks, every obstacle type, collectibles, stars) |
+| `Obstacle` | Trigger → Game Over via the state manager (also used by the bomb) |
+| `Collectible` / `StarPickup` | Trigger → collect; only hide themselves (`SetActive`), the chunk returns them to the pool (single-ownership) |
+| `ScoreManager` | Paws (distance × star multiplier) score + PawCoin counter + best record (PlayerPrefs); drives the HUD banner & the star 2× state |
+| `ScreenFlash` / `UIPulse` | Full-screen star-pickup flash / heartbeat pulse on the 2× badge |
 | `GameStateManager` | Run/GameOver state, delayed any-input restart (scene reload) |
-| `GameOverScreen` | Code-driven UI animation: fade-in, card pop (ease-out-back), pulsing button |
+| `GameOverScreen` | Code-driven UI animation: fade-in, card pop (ease-out-back), pulsing button; shows final Paws + best |
 
 **Fair difficulty guarantee:** the spawn system never fills every spawn point of a chunk with obstacles — there is always an escape corridor.
 
@@ -63,9 +66,9 @@ The whole game runs with **zero runtime `Instantiate`/`Destroy` calls** — ever
 - [x] Endless chunk-based road + object pooling
 - [x] Obstacle & collectible spawn system (multi-type obstacles)
 - [x] Animated Game Over card + instant restart + score HUD
-- [ ] Distance-based speed ramp (8 → 16 units/s)
-- [ ] Economy split: distance score (Paws) + PawCoin wallet + best-distance save
-- [ ] Star (timed 2× score multiplier) & bombs as distinct pickups
+- [x] Distance-based speed ramp (8 → 16 units/s)
+- [x] Economy split: distance score (Paws) + PawCoin wallet + best-distance save
+- [x] Star (timed 2× score multiplier) & bombs as distinct pickups (+ pickup screen flash, 2× HUD badge)
 - [ ] Moving obstacles (ping-pong bikes/scooters)
 - [ ] Milestone system: screen flash + material/color **Cat Evolution** (every 1000 m)
 - [ ] Game feel pass (particles, audio, camera shake, chunk layout variants) + WebGL build & publish (itch.io / GitHub Pages)
@@ -82,4 +85,4 @@ The whole game runs with **zero runtime `Instantiate`/`Destroy` calls** — ever
 
 ---
 
-*This is a living prototype — the design document (GDD v0.4) evolves alongside the code.* 🐈
+*This is a living prototype — the design document (GDD v0.5) evolves alongside the code.* 🐈
